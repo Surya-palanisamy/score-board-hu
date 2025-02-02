@@ -6,41 +6,53 @@
     <title>Auction Scoreboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body class="bg-gray-100 p-4">
-    <h1 class="text-center text-2xl font-bold mb-4">Auction Scoreboard</h1>
-    <div class="flex flex-col md:flex-row justify-center gap-4 mb-4">
-      <button id="resetButton" class="bg-orange-500 text-white px-4 py-2 rounded" onclick="resetTeams()">Reset All Data</button>
-      <button class="bg-blue-500 text-white px-4 py-2 rounded" onclick="exportData()">Export Data</button>
+  <body class="bg-gray-100 p-6">
+    <h1 class="text-center text-3xl font-bold mb-6">Auction Scoreboard</h1>
+    
+    <div class="flex flex-col md:flex-row justify-center gap-4 mb-6">
+      <button class="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600" onclick="exportData()">
+        Export Data
+      </button>
     </div>
-    <div class="flex justify-center mb-4">
-      <input type="text" id="searchInput" class="p-2 border rounded" placeholder="Search Team by Name" onkeyup="searchTeam()" />
+    
+    <div class="flex justify-center mb-6">
+      <input type="text" id="searchInput" class="p-3 border rounded-lg shadow-md w-72" placeholder="Search Team by Name" onkeyup="searchTeam()" />
     </div>
-    <div class="flex justify-center mb-4">
-      <input type="text" id="newTeamInput" class="p-2 border rounded" placeholder="Enter new team name" />
-      <button class="bg-green-500 text-white px-4 py-2 rounded ml-2" onclick="addNewTeam()">Add New Team</button>
+    
+    <div class="flex justify-center gap-2 mb-6">
+      <input type="text" id="newTeamInput" class="p-3 border rounded-lg shadow-md w-72" placeholder="Enter new team name" />
+      <button class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-600" onclick="addNewTeam()">
+        Add New Team
+      </button>
     </div>
-    <div class="flex justify-center mb-4">
-      <input type="text" id="bidInput" class="p-2 border rounded" placeholder="Bid Points" />
-      <button class="bg-purple-500 text-white px-4 py-2 rounded ml-2" onclick="placeBid()">Place Bid</button>
+    
+    <div class="flex justify-center gap-2 mb-6">
+      <input type="text" id="bidTeamInput" class="p-3 border rounded-lg shadow-md w-64" placeholder="Enter Team Name" />
+      <input type="number" id="bidInput" class="p-3 border rounded-lg shadow-md w-32" placeholder="Bid Points" />
+      <button class="bg-purple-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-purple-600" onclick="placeBid()">
+        Place Bid
+      </button>
     </div>
-    <div id="errorMessage" class="text-red-500 text-center mb-4"></div>
+    
+    <div id="errorMessage" class="text-red-500 text-center mb-6 font-semibold"></div>
+    
     <div class="overflow-x-auto">
-      <table class="w-full border-collapse bg-white">
+      <table class="w-full border-collapse bg-white shadow-lg rounded-lg">
         <thead>
-          <tr class="bg-blue-500 text-white">
-            <th class="p-2">Rank</th>
-            <th class="p-2">Team Name</th>
-            <th class="p-2">Points</th>
-            <th class="p-2">Bid</th>
-            <th class="p-2">Action</th>
+          <tr class="bg-blue-500 text-white text-lg">
+            <th class="p-4 border">Rank</th>
+            <th class="p-4 border">Team Name</th>
+            <th class="p-4 border">Points</th>
+            <th class="p-4 border">Bid</th>
+            <th class="p-4 border">Action</th>
           </tr>
         </thead>
         <tbody id="scoreBody"></tbody>
       </table>
     </div>
+    
     <script>
-      let teams = JSON.parse(localStorage.getItem("teams")) || [
-      ];
+      let teams = JSON.parse(localStorage.getItem("teams")) || [];
       let lastState = JSON.parse(JSON.stringify(teams));
 
       function saveAndUpdate() {
@@ -57,13 +69,13 @@
           const row = document.createElement("tr");
           if (index === 0) row.classList.add("bg-yellow-300");
           row.innerHTML = `
-            <td class="p-2 border">${index + 1}</td>
-            <td class="p-2 border">${team.name}</td>
-            <td class="p-2 border">${team.points}</td>
-            <td class="p-2 border">${team.bid}</td>
-            <td class="p-2 border">
-              <button class="bg-green-500 text-white px-2 py-1 rounded" onclick="handleAnswer('${team.name}', true)">Correct</button>
-              <button class="bg-red-500 text-white px-2 py-1 rounded ml-2" onclick="handleAnswer('${team.name}', false)">Wrong</button>
+            <td class="p-4 border text-center">${index + 1}</td>
+            <td class="p-4 border text-center">${team.name}</td>
+            <td class="p-4 border text-center">${team.points}</td>
+            <td class="p-4 border text-center">${team.bid}</td>
+            <td class="p-4 border text-center">
+              <button class="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600" onclick="handleAnswer('${team.name}', true)">Correct</button>
+              <button class="bg-red-500 text-white px-4 py-2 rounded-lg ml-2 shadow-md hover:bg-red-600" onclick="handleAnswer('${team.name}', false)">Wrong</button>
             </td>
           `;
           tbody.appendChild(row);
@@ -73,7 +85,7 @@
       function addNewTeam() {
         const newTeamName = document.getElementById("newTeamInput").value.trim();
         if (newTeamName && !teams.some((t) => t.name.toLowerCase() === newTeamName.toLowerCase())) {
-          teams.push({ name: newTeamName, points: 100, bid: 0 });
+          teams.push({ name: newTeamName, points: 10000, bid: 0 });
           document.getElementById("newTeamInput").value = "";
           saveAndUpdate();
           clearError();
@@ -84,20 +96,30 @@
 
       function placeBid() {
         const bid = parseInt(document.getElementById("bidInput").value.trim());
+        const teamName = document.getElementById("bidTeamInput").value.trim();
+
+        if (!teamName) {
+          showError("Please enter a team name.");
+          return;
+        }
+
         if (isNaN(bid) || bid <= 0) {
           showError("Invalid bid. Please enter a positive number.");
           return;
         }
-        const teamName = prompt("Enter the team name (e.g., Team A):");
+
         const team = teams.find((t) => t.name.toLowerCase() === teamName.toLowerCase());
+
         if (!team) {
           showError("Team not found.");
           return;
         }
+
         if (bid > team.points) {
           showError("Bid cannot exceed available points.");
           return;
         }
+
         team.bid = bid;
         saveAndUpdate();
         clearError();
@@ -119,6 +141,18 @@
         }
         team.bid = 0;
         saveAndUpdate();
+      }
+
+      function exportData() {
+        const dataStr = JSON.stringify(teams, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "auction_teams.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
       }
 
       function searchTeam() {
